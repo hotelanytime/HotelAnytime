@@ -71,8 +71,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
-          <div className="space-y-4">
+          
+          {/* <div className="space-y-4">
             <h3 className="text-lg font-semibold">Services</h3>
             <ul className="space-y-2 text-sm">
               <li><span className="text-gray-400">Room Service</span></li>
@@ -82,7 +82,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Contact</h3>
             <div className="space-y-2 text-sm text-gray-400">
@@ -91,7 +91,7 @@ export default function Footer() {
               <p>+1 (555) 123-4567</p>
               <p>info@grandhotel.com</p>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
