@@ -1,4 +1,4 @@
-# Grand Hotel Website
+# Hotel Website
 
 A modern, full-stack hotel website built with Next.js, featuring a beautiful frontend and a secure admin panel for content management.
 
