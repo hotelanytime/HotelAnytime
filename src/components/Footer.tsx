@@ -96,6 +96,19 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
           <p>&copy; 2025 {hotelName || 'Hotel Website'}. All rights reserved.</p>
+          <div className="mt-4 pt-4 border-t border-gray-800">
+            <p className="text-gray-500">
+              Designed & Developed with ❤️ by{' '}
+              <a 
+                href="https://soul059.github.io/Business-card/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-orange-400 hover:text-orange-300 transition-colors font-medium"
+              >
+                Keval Chauhan
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
