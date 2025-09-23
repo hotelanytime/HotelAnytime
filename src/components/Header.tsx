@@ -48,13 +48,13 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="flex justify-between items-center h-16 w-full min-w-0">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
+          <Link href="/" className="flex-shrink-0 min-w-0 max-w-xs">
             {hotelName ? (
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold text-gray-900 truncate">
                 {hotelName.split(' ').map((word: string, index: number) => (
                   <span key={index}>
                     {index === hotelName.split(' ').length - 1 ? (
@@ -73,12 +73,12 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-8 flex-1 justify-center min-w-0">
             {navigation.map((item) => (
               <button
                 key={item.name}
                 onClick={() => scrollToSection(item.href)}
-                className="text-gray-700 hover:text-orange-600 font-medium transition-colors duration-300"
+                className="text-gray-700 hover:text-orange-600 font-medium transition-colors duration-300 whitespace-nowrap"
               >
                 {item.name}
               </button>
@@ -86,10 +86,10 @@ export default function Header() {
           </nav>
 
           {/* CTA Button */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4 flex-shrink-0">
             <button 
               onClick={() => scrollToSection('#contact')}
-              className="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-300"
+              className="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-300 whitespace-nowrap"
             >
               Book Now
             </button>
@@ -116,19 +116,19 @@ export default function Header() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden border-t border-gray-200 bg-white"
+            className="md:hidden border-t border-gray-200 bg-white w-full overflow-hidden"
           >
-            <div className="py-4 space-y-2">
+            <div className="py-4 space-y-2 w-full">
               {navigation.map((item) => (
                 <button
                   key={item.name}
                   onClick={() => scrollToSection(item.href)}
-                  className="block w-full text-left px-4 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 font-medium transition-colors duration-300"
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 font-medium transition-colors duration-300 truncate"
                 >
                   {item.name}
                 </button>
               ))}
-              <div className="px-4 pt-2">
+              <div className="px-4 pt-2 w-full">
                 <button 
                   onClick={() => scrollToSection('#contact')}
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300"
