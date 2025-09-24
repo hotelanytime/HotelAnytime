@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Room } from '@/models';
+import { Room as RoomType } from '@/types';
 import { hasMongoURI } from '@/lib/mongodb';
 
 export async function GET() {
   try {
-    let rooms: any[] = [];
+    let rooms: RoomType[] = [];
     if (hasMongoURI) {
       try {
         await connectDB();
@@ -17,10 +18,11 @@ export async function GET() {
     
     if (rooms.length === 0) {
       // Default rooms data
-      const defaultRooms = [
+      const defaultRooms: RoomType[] = [
         {
           _id: "deluxe-suite",
           name: "Deluxe Suite",
+          type: "Suite",
           shortDescription: "Spacious suite with city views",
           description: "Experience luxury in our Deluxe Suite featuring a spacious bedroom, separate living area, and stunning city views. Perfect for business travelers and couples seeking comfort and elegance.",
           price: 299,
@@ -30,12 +32,15 @@ export async function GET() {
           ],
           amenities: ["King Bed", "City View", "Mini Bar", "Work Desk", "Free Wi-Fi", "Room Service"],
           capacity: 2,
+          maxGuests: 2,
           size: "45 sqm",
+          rating: 4.8,
           available: true
         },
         {
           _id: "executive-room",
           name: "Executive Room",
+          type: "Executive",
           shortDescription: "Perfect for business travelers",
           description: "Our Executive Room combines comfort with functionality, featuring premium amenities and a dedicated workspace. Ideal for business travelers who demand excellence.",
           price: 199,
@@ -45,12 +50,15 @@ export async function GET() {
           ],
           amenities: ["Queen Bed", "Work Station", "Mini Bar", "Free Wi-Fi", "Coffee Machine"],
           capacity: 2,
+          maxGuests: 2,
           size: "35 sqm",
+          rating: 4.6,
           available: true
         },
         {
           _id: "standard-room",
           name: "Standard Room",
+          type: "Standard",
           shortDescription: "Comfortable and affordable",
           description: "Our Standard Room offers all essential amenities for a comfortable stay. Clean, modern, and thoughtfully designed for relaxation and convenience.",
           price: 129,
@@ -60,7 +68,9 @@ export async function GET() {
           ],
           amenities: ["Double Bed", "Private Bathroom", "Free Wi-Fi", "TV", "Air Conditioning"],
           capacity: 2,
+          maxGuests: 2,
           size: "25 sqm",
+          rating: 4.4,
           available: true
         }
       ];
@@ -79,18 +89,21 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body: Partial<RoomType> = await request.json();
     
     // Prepare room data with defaults for required fields
-    const roomData = {
+    const roomData: Partial<RoomType> = {
       name: body.name || 'New Room',
+      type: body.type || 'Standard',
       shortDescription: body.shortDescription || 'A comfortable room',
       description: body.description || 'A detailed description of this room.',
       price: body.price || 100,
       images: body.images || [],
       amenities: body.amenities || [],
       capacity: body.capacity || 2,
+      maxGuests: body.maxGuests || 2,
       size: body.size || '25 sqm',
+      rating: body.rating || 4,
       available: body.available !== undefined ? body.available : true
     };
     

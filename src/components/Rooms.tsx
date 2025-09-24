@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Room as RoomType } from '@/types';
 import { Users, Square, Wifi, Coffee, Car } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Rooms() {
   const [rooms, setRooms] = useState<RoomType[]>([]);
@@ -75,9 +76,11 @@ export default function Rooms() {
             >
               {/* Room Image */}
               <div className="relative h-64 overflow-hidden">
-                <img
+                <Image
                   src={room.images[0]}
                   alt={room.name}
+                  layout="fill"
+                  objectFit="cover"
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                 />
                 <div className="absolute top-4 right-4">

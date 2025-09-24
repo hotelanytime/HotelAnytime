@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Image from 'next/image';
 
 export default function RoomDetails() {
   const params = useParams();
@@ -154,9 +155,11 @@ export default function RoomDetails() {
               className="space-y-6"
             >
               <div className="relative aspect-w-4 aspect-h-3 rounded-3xl overflow-hidden shadow-2xl group">
-                <img
+                <Image
                   src={room.images[selectedImage]}
                   alt={room.name}
+                  width={500}
+                  height={500}
                   className="w-full h-[500px] object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -200,9 +203,11 @@ export default function RoomDetails() {
                           : 'border-gray-200 hover:border-orange-300'
                       }`}
                     >
-                      <img
+                      <Image
                         src={image}
                         alt={`${room.name} ${index + 1}`}
+                        width={100}
+                        height={100}
                         className="w-full h-full object-cover"
                       />
                     </motion.button>

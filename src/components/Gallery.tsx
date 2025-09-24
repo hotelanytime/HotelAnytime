@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Gallery as GalleryType } from '@/types';
+import Image from 'next/image';
 
 export default function Gallery() {
   const [gallery, setGallery] = useState<GalleryType | null>(null);
@@ -101,24 +102,14 @@ export default function Gallery() {
                   overflow: 'hidden'
                 }}
               >
-                <img
+                <Image
                   src={image.url}
                   alt={image.caption}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    display: 'block',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    transition: 'transform 0.5s ease'
-                  }}
+                  layout="fill"
+                  objectFit="cover"
                   className="group-hover:scale-110"
                   onError={(e) => {
                     console.error('Gallery image failed to load:', image.url);
-                    e.currentTarget.style.backgroundColor = '#fee2e2';
-                    e.currentTarget.style.border = '2px solid #ef4444';
                   }}
                   onLoad={() => {
                     console.log('Gallery image loaded successfully:', image.url);

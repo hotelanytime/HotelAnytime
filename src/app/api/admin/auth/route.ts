@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     try {
       const existingToken = request.cookies.get('admin-token')?.value;
       if (existingToken) {
-        const decoded: any = jwt.verify(existingToken, jwtSecret);
+                const decoded = jwt.verify(existingToken, jwtSecret) as JwtPayload;
         if (decoded?.username === adminUsername) {
           console.log('Auth API - Existing valid token detected, returning current session');
           return NextResponse.json({

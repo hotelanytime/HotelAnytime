@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -9,10 +9,6 @@ import {
   Image as ImageIcon,
   Settings,
   LogOut,
-  Edit,
-  Plus,
-  Trash2,
-  Upload,
   Lock
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
@@ -35,13 +31,9 @@ export default function AdminDashboard() {
     gallery: null as Gallery | null,
     contact: null as Contact | null,
   });
-
-  // Editor states - kept for legacy compatibility but may not be needed
-  const [heroData, setHeroData] = useState<Partial<Hero>>({});
-  const [aboutData, setAboutData] = useState<Partial<About>>({});
-  const [contactData, setContactData] = useState<Partial<Contact>>({});
   
   const router = useRouter();
+  const redirectingRef = useRef(false);
 
   const tabs = [
     { id: 'hero', name: 'Hero Section', icon: Home },
@@ -51,26 +43,7 @@ export default function AdminDashboard() {
     { id: 'contact', name: 'Contact', icon: Settings },
   ];
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  // Update editor states when data changes
-  useEffect(() => {
-    if (data.hero) {
-      setHeroData(data.hero);
-    }
-    if (data.about) {
-      setAboutData(data.about);
-    }
-    if (data.contact) {
-      setContactData(data.contact);
-    }
-  }, [data]);
-
-  const redirectingRef = useRef(false);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     if (redirectingRef.current) return;
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('admin-token') : null;
@@ -108,7 +81,11 @@ export default function AdminDashboard() {
       redirectingRef.current = true;
       router.replace('/admin/login');
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -139,60 +116,14 @@ export default function AdminDashboard() {
     }
   };
 
+  type UpdatableData = Hero | About | Room[] | Gallery | Contact;
+
   const handleLogout = async () => {
     try {
-      await fetch('/api/admin/auth', { 
-        method: 'DELETE',
-        credentials: 'include'
-      });
-      
       localStorage.removeItem('admin-token');
-      toast.success('Logged out successfully');
-      
-      // Small delay to show the message
-      setTimeout(() => {
-        router.push('/admin/login');
-      }, 1000);
+      router.replace('/admin/login');
     } catch (error) {
-      toast.error('Logout failed');
-      localStorage.removeItem('admin-token');
-      router.push('/admin/login');
-    }
-  };
-
-  const updateData = async (endpoint: string, updatedData: any) => {
-    try {
-      const response = await fetch(`/api/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData),
-      });
-
-      if (response.ok) {
-        toast.success('Data updated successfully');
-        fetchData();
-      } else {
-        toast.error('Failed to update data');
-      }
-    } catch (error) {
-      toast.error('An error occurred');
-    }
-  };
-
-  const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      return result.url;
-    } else {
-      throw new Error('Upload failed');
+      console.error('Logout error:', error);
     }
   };
 

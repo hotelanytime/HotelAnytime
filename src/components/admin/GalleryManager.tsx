@@ -4,6 +4,7 @@ import { Gallery, GalleryImage } from '@/types';
 import ImageLibraryModal from './ImageLibraryModal';
 import { Plus, Trash2, Image as ImageIcon, Save, Edit, X, Grid } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 interface Props { 
   data: Gallery | null; 
@@ -124,22 +125,13 @@ export default function GalleryManager({ data, onSaved }: Props) {
                 <div key={img.url || `gallery-${i}`} className="group bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                   {/* Simple image display */}
                   <div style={{ width: '100%', height: '200px', position: 'relative', backgroundColor: '#f9fafb' }}>
-                    <img 
+                    <Image 
                       src={img.url} 
                       alt={img.caption || `Gallery image ${i + 1}`}
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover',
-                        display: 'block',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0
-                      }}
+                      layout="fill"
+                      objectFit="cover"
                       onError={(e) => {
                         console.error('Gallery image failed to load:', img.url);
-                        e.currentTarget.style.backgroundColor = '#fee2e2';
-                        e.currentTarget.style.border = '2px solid #ef4444';
                       }}
                       onLoad={() => {
                         console.log('Gallery image loaded successfully:', img.url);
@@ -213,20 +205,13 @@ export default function GalleryManager({ data, onSaved }: Props) {
             {form.images && form.images[editingIndex] && (
               <div className="space-y-4">
                 <div style={{ width: '100%', height: '200px', position: 'relative', backgroundColor: '#f9fafb' }}>
-                  <img 
+                  <Image 
                     src={form.images[editingIndex].url} 
                     alt="Gallery image preview"
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover',
-                      display: 'block',
-                      borderRadius: '8px'
-                    }}
+                    layout="fill"
+                    objectFit="cover"
                     onError={(e) => {
                       console.error('Edit modal image failed to load:', form.images?.[editingIndex]?.url);
-                      e.currentTarget.style.backgroundColor = '#fee2e2';
-                      e.currentTarget.style.border = '2px solid #ef4444';
                     }}
                   />
                 </div>

@@ -91,9 +91,9 @@ export default function ContactEditor({ data, onSaved }: Props) {
         </button>
       </div>
       
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-6">
-          <div className="space-y-4">
+      <div className="grid gap-4 sm:gap-6 xl:grid-cols-2">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-4">
             <h3 className="font-semibold flex items-center gap-2 text-gray-800">
               <MapPin className="w-5 h-5 text-gray-700"/> Address & Location
             </h3>
@@ -105,11 +105,11 @@ export default function ContactEditor({ data, onSaved }: Props) {
                 onChange={e => update({ address: e.target.value })} 
                 rows={3}
                 placeholder="123 Hotel Street, City, State, ZIP"
-                className="w-full p-3 border rounded text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full p-2 sm:p-3 border rounded text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm sm:text-base resize-none"
               />
             </div>
             
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-800">Latitude</label>
                 <input 
@@ -122,7 +122,8 @@ export default function ContactEditor({ data, onSaved }: Props) {
                       lng: form.coordinates?.lng || 0
                     } 
                   })} 
-                  className="w-full text-gray-700 p-3 border rounded"
+                  className="w-full text-gray-700 p-2 sm:p-3 border rounded text-sm sm:text-base"
+                  placeholder="40.7128"
                 />
               </div>
               
@@ -138,13 +139,14 @@ export default function ContactEditor({ data, onSaved }: Props) {
                       lng: parseFloat(e.target.value) || 0 
                     } 
                   })} 
-                  className="w-full p-3 text-gray-700 border rounded"
+                  className="w-full p-2 sm:p-3 text-gray-700 border rounded text-sm sm:text-base"
+                  placeholder="-74.0060"
                 />
               </div>
             </div>
           </div>
           
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <h3 className="font-semibold flex items-center gap-2 text-gray-800">
               <Phone className="w-5 h-5"/> Contact Details
             </h3>
@@ -155,7 +157,7 @@ export default function ContactEditor({ data, onSaved }: Props) {
                 value={form.phone || ''} 
                 onChange={e => update({ phone: e.target.value })} 
                 placeholder="+1 (555) 123-4567"
-                className="w-full p-3 border rounded text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full p-2 sm:p-3 border rounded text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm sm:text-base"
               />
             </div>
             
@@ -166,7 +168,7 @@ export default function ContactEditor({ data, onSaved }: Props) {
                 value={form.email || ''} 
                 onChange={e => update({ email: e.target.value })} 
                 placeholder="info@hotel.com"
-                className="w-full p-3 border text-gray-700 rounded"
+                className="w-full p-2 sm:p-3 border text-gray-700 rounded text-sm sm:text-base"
               />
             </div>
             
@@ -177,14 +179,14 @@ export default function ContactEditor({ data, onSaved }: Props) {
                 value={form.website || ''} 
                 onChange={e => update({ website: e.target.value })} 
                 placeholder="https://hotel.com"
-                className="w-full p-3 border text-gray-700 rounded"
+                className="w-full p-2 sm:p-3 border text-gray-700 rounded text-sm sm:text-base"
               />
             </div>
           </div>
         </div>
         
-        <div className="space-y-6">
-          <div className="space-y-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-4">
             <h3 className="font-semibold flex items-center gap-2 text-gray-800">
               <Clock className="w-5 h-5"/> Business Hours
             </h3>
@@ -195,7 +197,7 @@ export default function ContactEditor({ data, onSaved }: Props) {
                 value={form.hours || ''} 
                 onChange={e => update({ hours: e.target.value })} 
                 placeholder="24/7 or Mon-Sun: 9:00 AM - 6:00 PM"
-                className="w-full p-3 border text-gray-700 placeholder:text-gray-400 rounded"
+                className="w-full p-2 sm:p-3 border text-gray-700 placeholder:text-gray-400 rounded text-sm sm:text-base"
               />
             </div>
             
@@ -205,7 +207,7 @@ export default function ContactEditor({ data, onSaved }: Props) {
                 value={form.checkinTime || ''} 
                 onChange={e => update({ checkinTime: e.target.value })} 
                 placeholder="3:00 PM"
-                className="w-full p-3 border text-gray-700 rounded"
+                className="w-full p-2 sm:p-3 border text-gray-700 rounded text-sm sm:text-base"
               />
             </div>
             
@@ -215,37 +217,37 @@ export default function ContactEditor({ data, onSaved }: Props) {
                 value={form.checkoutTime || ''} 
                 onChange={e => update({ checkoutTime: e.target.value })} 
                 placeholder="11:00 AM"
-                className="w-full p-3 border text-gray-700 rounded"
+                className="w-full p-2 sm:p-3 border text-gray-700 rounded text-sm sm:text-base"
               />
             </div>
           </div>
           
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="font-semibold flex items-center gap-2 text-gray-800">
                 <Globe className="w-5 h-5"/> Social Media
               </h3>
               <button 
                 onClick={addSocialLink} 
-                className="flex items-center gap-1 text-sm text-orange-600"
+                className="flex items-center justify-center gap-1 text-sm text-orange-600 px-3 py-1 rounded border border-orange-200 hover:bg-orange-50 w-full sm:w-auto"
               >
-                <Plus className="w-4 h-4"/> Add Link
+                <Plus className="w-4 h-4"/> Add Social Link
               </button>
             </div>
             
             <div className="space-y-3">
               {(form.socialLinks || []).map((link, i) => (
-                <div key={link.platform || `social-${i}`} className="border border-gray-500 rounded p-3 space-y-2">
-                  <div className="flex gap-2">
+                <div key={link.platform || `social-${i}`} className="border border-gray-300 bg-gray-50 rounded p-3 space-y-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <select 
                       value={link.platform} 
                       onChange={e => updateSocialLink(i, { 
                         platform: e.target.value,
                         icon: socialPlatforms.find(p => p.name === e.target.value)?.icon || ''
                       })} 
-                      className="w-32 p-2 border text-gray-700 rounded"
+                      className="w-full sm:w-32 p-2 border text-gray-700 rounded text-sm"
                     >
-                      <option value="">Platform</option>
+                      <option value="">Select Platform</option>
                       {socialPlatforms.map(platform => (
                         <option key={platform.name} value={platform.name}>
                           {platform.name}
@@ -257,21 +259,24 @@ export default function ContactEditor({ data, onSaved }: Props) {
                       placeholder="Profile URL" 
                       value={link.url} 
                       onChange={e => updateSocialLink(i, { url: e.target.value })} 
-                      className="flex-1 text-gray-700 p-2 border rounded"
+                      className="flex-1 text-gray-700 p-2 border rounded text-sm"
                     />
                     
                     <button 
                       onClick={() => removeSocialLink(i)} 
-                      className="text-red-600 hover:text-red-700"
+                      className="text-red-600 hover:text-red-700 p-2 w-full sm:w-auto flex items-center justify-center gap-1 border border-red-200 rounded hover:bg-red-50"
                     >
                       <Trash2 className="w-4 h-4"/>
+                      <span className="sm:hidden">Remove</span>
                     </button>
                   </div>
                 </div>
               ))}
               
               {!(form.socialLinks || []).length && (
-                <div className="text-sm text-gray-500">No social media links added yet.</div>
+                <div className="text-sm text-gray-500 text-center py-4 border border-dashed border-gray-300 rounded">
+                  No social media links added yet. Click "Add Social Link" to get started.
+                </div>
               )}
             </div>
           </div>

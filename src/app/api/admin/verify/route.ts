@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 // Force dynamic to avoid any caching of auth result
 export const dynamic = 'force-dynamic';
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      const decoded = jwt.verify(token, jwtSecret) as any;
+            const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
       return NextResponse.json({
         authenticated: true,
         user: { username: decoded.username, role: decoded.role }

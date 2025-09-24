@@ -1,4 +1,5 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse, SearchApiResponse } from 'cloudinary';
+import { Asset } from '@/types';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -41,13 +42,22 @@ export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
   }
 };
 
-export const listCloudinaryImages = async (folder = 'hotel-website', max = 100) => {
-  const result: any = await (cloudinary as any).search
+export const listCloudinaryImages = async (folder = 'hotel-website', max = 100): Promise<Asset[]> => {
+  const result: SearchApiResponse = await cloudinary.search
     .expression(`folder=${folder}`)
     .sort_by('created_at','desc')
     .max_results(Math.min(max, 100))
     .execute();
-  return result.resources || [];
+
+  return (result.resources || []).map(r => ({
+    url: r.secure_url,
+    public_id: r.public_id,
+    format: r.format,
+    bytes: r.bytes,
+    width: r.width,
+    height: r.height,
+    created_at: r.created_at,
+  }));
 };
 
 export default cloudinary;

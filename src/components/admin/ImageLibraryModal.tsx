@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Asset } from '@/types';
 import { X, Upload, RefreshCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 interface Props { 
   isOpen: boolean; 
@@ -109,7 +110,7 @@ export default function ImageLibraryModal({ isOpen, onClose, onSelect, multiple 
                 onClick={() => toggleSelect(a)} 
                 className={`relative group rounded overflow-hidden border ${sel ? 'ring-2 ring-orange-500' : 'hover:shadow'}`}
               >
-                <img src={a.url} alt={a.public_id} className="w-full h-32 object-cover"/>
+                                <Image src={a.url} alt={a.public_id} width={128} height={128} className="w-full h-32 object-cover"/>
                 {sel && (
                   <span className="absolute top-1 right-1 bg-orange-600 text-white text-xs px-2 py-0.5 rounded">
                     Selected

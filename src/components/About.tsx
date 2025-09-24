@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { About as AboutType } from '@/types';
 import { Wifi, Car, Utensils, Dumbbell, Star, Users, Clock, Shield } from 'lucide-react';
+import Image from 'next/image';
 
 const iconMap = {
   wifi: Wifi,
@@ -101,9 +102,11 @@ export default function About() {
             className="relative"
           >
             <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-              <img
+              <Image
                 src={about.image}
                 alt="Hotel Interior"
+                width={500}
+                height={500}
                 className="w-full h-[500px] object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>

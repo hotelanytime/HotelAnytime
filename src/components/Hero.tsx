@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Hero as HeroType } from '@/types';
+import Image from 'next/image';
 
 export default function Hero() {
   const [hero, setHero] = useState<HeroType | null>(null);
@@ -46,16 +47,21 @@ export default function Hero() {
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
-      {hero?.backgroundImage && imageLoaded && !imageError && (
-        <img
+      {hero?.backgroundImage && (
+        <Image
           src={hero.backgroundImage}
           alt="Hotel background"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
           className="absolute inset-0 w-full z-30 h-full object-cover"
+          onLoad={() => setImageLoaded(true)}
+          onError={() => setImageError(true)}
         />
       )}
       
       {/* Fallback gradient background */}
-      {(!hero?.backgroundImage || !imageLoaded || imageError) && (
+      {(!hero?.backgroundImage || imageError) && (
         <div className="absolute inset-0 bg-gradient-to-br from-orange-900 to-red-900 z-0" />
       )}
       
@@ -64,23 +70,6 @@ export default function Hero() {
       
       {/* Additional subtle gradient overlay for better text readability */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40 z-20" />
-      
-      {/* Hidden image for loading detection */}
-      {hero?.backgroundImage && (
-        <img
-          src={hero.backgroundImage}
-          alt=""
-          className="hidden"
-          onLoad={() => {
-            console.log('Hero image loaded successfully:', hero?.backgroundImage);
-            setImageLoaded(true);
-          }}
-          onError={(e) => {
-            console.error('Hero image failed to load:', hero?.backgroundImage);
-            setImageError(true);
-          }}
-        />
-      )}
       
       {/* Loading indicator */}
       {hero?.backgroundImage && !imageLoaded && !imageError && (

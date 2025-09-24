@@ -4,6 +4,7 @@ import { Room } from '@/types';
 import ImageLibraryModal from './ImageLibraryModal';
 import { Plus, Trash2, Image as ImageIcon, Save, Edit, X, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 interface Props { 
   data: Room[] | null; 
@@ -133,21 +134,23 @@ export default function RoomsManager({ data, onSaved }: Props) {
         </button>
       </div>
       
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {rooms.map(room => (
-          <div key={room._id} className="border border-gray-600 rounded-lg p-4 space-y-3">
-            <div className="flex justify-between items-start">
-              <h3 className="font-semibold text-gray-700">{room.name}</h3>
-              <div className="flex gap-1">
+          <div key={room._id} className="border border-gray-300 bg-white rounded-lg p-3 sm:p-4 space-y-3 shadow-sm">
+            <div className="flex justify-between items-start gap-2">
+              <h3 className="font-semibold text-gray-700 text-sm sm:text-base truncate flex-1">{room.name}</h3>
+              <div className="flex gap-1 flex-shrink-0">
                 <button 
                   onClick={() => startEditing(room)} 
-                  className="text-orange-600 hover:text-orange-700"
+                  className="text-orange-600 hover:text-orange-700 p-1"
+                  title="Edit room"
                 >
                   <Edit className="w-4 h-4"/>
                 </button>
                 <button 
                   onClick={() => deleteRoom(room._id)} 
-                  className="text-red-600 hover:text-red-700"
+                  className="text-red-600 hover:text-red-700 p-1"
+                  title="Delete room"
                 >
                   <Trash2 className="w-4 h-4"/>
                 </button>
@@ -155,14 +158,22 @@ export default function RoomsManager({ data, onSaved }: Props) {
             </div>
             
             {room.images?.[0] && (
-              <img src={room.images[0]} className="w-full h-32 object-cover rounded"/>
+              <div className="w-full h-32 sm:h-40 rounded overflow-hidden bg-gray-100">
+                <Image 
+                  src={room.images[0]} 
+                  alt={room.name} 
+                  width={200} 
+                  height={160} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
             )}
             
             <div className="text-sm space-y-1">
-              <div className="text-gray-600">{room.type}</div>
+              <div className="text-gray-600 truncate">{room.type}</div>
               <div className="font-medium text-gray-700">₹{room.price}/night</div>
               <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-yellow-500"/>
+                <Star className="w-4 h-4 text-yellow-500 flex-shrink-0"/>
                 <span>{room.rating}</span>
                 <span className="text-gray-500">• {room.maxGuests} guests</span>
               </div>
@@ -171,41 +182,50 @@ export default function RoomsManager({ data, onSaved }: Props) {
         ))}
         
         {!rooms.length && (
-          <div className="col-span-full text-center py-8 text-gray-500">
-            No rooms added yet.
+          <div className="col-span-full text-center py-8 text-gray-500 border border-dashed border-gray-300 rounded-lg">
+            <div className="space-y-2">
+              <p>No rooms added yet.</p>
+              <p className="text-xs text-gray-400">Click "Add Room" to create your first room listing.</p>
+            </div>
           </div>
         )}
       </div>
       
       {editingRoom && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-lg p-3 sm:p-6 max-w-2xl w-full my-4 sm:my-0 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4 sm:mb-6 sticky top-0 bg-white pb-2 border-b sm:border-b-0 sm:pb-0">
               <h3 className="text-lg sm:text-xl text-gray-900 font-semibold">
                 {editingRoom.isNew ? 'Add Room' : 'Edit Room'}
               </h3>
-              <button onClick={() => setEditingRoom(null)} className="p-1">
+              <button 
+                onClick={() => setEditingRoom(null)} 
+                className="p-1 hover:bg-gray-100 rounded"
+                title="Close"
+              >
                 <X className="w-5 h-5 sm:w-6 sm:h-6"/>
               </button>
             </div>
             
-            <div className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-800">Name</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-800">Room Name</label>
                   <input 
                     value={editingRoom.name || ''} 
                     onChange={e => updateEditing({ name: e.target.value })} 
-                    className="w-full p-3 border rounded text-gray-700"
+                    className="w-full p-2 sm:p-3 border rounded text-gray-700 text-sm sm:text-base"
+                    placeholder="Deluxe Suite"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Type</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-800">Room Type</label>
                   <input 
                     value={editingRoom.type || ''} 
                     onChange={e => updateEditing({ type: e.target.value })} 
-                    className="w-full p-3 border text-gray-700 rounded"
+                    className="w-full p-2 sm:p-3 border text-gray-700 rounded text-sm sm:text-base"
+                    placeholder="Suite"
                   />
                 </div>
               </div>
@@ -216,24 +236,25 @@ export default function RoomsManager({ data, onSaved }: Props) {
                   value={editingRoom.description || ''} 
                   onChange={e => updateEditing({ description: e.target.value })} 
                   rows={3} 
-                  className="w-full p-3 border rounded text-gray-700"
+                  className="w-full p-2 sm:p-3 border rounded text-gray-700 text-sm sm:text-base resize-none"
+                  placeholder="Describe the room features and amenities..."
                 />
               </div>
               
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
                 <div>
                   <label className="block text-sm font-medium mb-1 text-gray-800">Price (₹ per night)</label>
                   <input 
                     type="number" 
                     value={editingRoom.price || 0} 
                     onChange={e => updateEditing({ price: parseFloat(e.target.value) || 0 })} 
-                    className="w-full p-3 border rounded text-gray-700"
+                    className="w-full p-2 sm:p-3 border rounded text-gray-700 text-sm sm:text-base"
                     placeholder="e.g., 3500"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-800">Rating</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-800">Rating (0-5)</label>
                   <input 
                     type="number" 
                     min="0" 
@@ -241,7 +262,8 @@ export default function RoomsManager({ data, onSaved }: Props) {
                     step="0.1" 
                     value={editingRoom.rating || 0} 
                     onChange={e => updateEditing({ rating: parseFloat(e.target.value) || 0 })} 
-                    className="w-full p-3 border rounded text-gray-700"
+                    className="w-full p-2 sm:p-3 border rounded text-gray-700 text-sm sm:text-base"
+                    placeholder="4.5"
                   />
                 </div>
                 
@@ -252,7 +274,8 @@ export default function RoomsManager({ data, onSaved }: Props) {
                     min="1" 
                     value={editingRoom.maxGuests || 2} 
                     onChange={e => updateEditing({ maxGuests: parseInt(e.target.value) || 2 })} 
-                    className="w-full p-3 border rounded text-gray-700"
+                    className="w-full p-2 sm:p-3 border rounded text-gray-700 text-sm sm:text-base"
+                    placeholder="2"
                   />
                 </div>
               </div>
@@ -262,18 +285,26 @@ export default function RoomsManager({ data, onSaved }: Props) {
                 <div className="space-y-2">
                   <button 
                     onClick={() => setShowLibrary(true)} 
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm flex items-center gap-2 text-gray-700"
+                    className="w-full sm:w-auto px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm flex items-center justify-center gap-2 text-gray-700"
                   >
-                    <ImageIcon className="w-4 h-4"/> Select Images ({(editingRoom.images || []).length})
+                    <ImageIcon className="w-4 h-4"/> Select Images ({(editingRoom.images || []).length} selected)
                   </button>
                   
                   {(editingRoom.images || []).length > 0 && (
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {(editingRoom.images || []).slice(0, 4).map((img, i) => (
-                        <img key={img || `image-${i}`} src={img} className="h-16 w-full object-cover rounded"/>
+                        <div key={img || `image-${i}`} className="aspect-square">
+                          <Image 
+                            alt="room image" 
+                            src={img} 
+                            width={80} 
+                            height={80} 
+                            className="w-full h-full object-cover rounded"
+                          />
+                        </div>
                       ))}
                       {(editingRoom.images || []).length > 4 && (
-                        <div className="h-16 bg-gray-100 rounded flex items-center justify-center text-sm">
+                        <div className="aspect-square bg-gray-100 rounded flex items-center justify-center text-sm">
                           +{(editingRoom.images || []).length - 4}
                         </div>
                       )}
@@ -283,46 +314,52 @@ export default function RoomsManager({ data, onSaved }: Props) {
               </div>
               
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-800">Amenities</label>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
+                  <label className="block text-sm font-medium text-gray-800">Room Amenities</label>
                   <button 
                     onClick={addAmenity} 
-                    className="text-sm text-orange-600 flex items-center gap-1"
+                    className="text-sm text-orange-600 flex items-center justify-center gap-1 px-3 py-1 rounded border border-orange-200 hover:bg-orange-50 w-full sm:w-auto"
                   >
-                    <Plus className="w-4 h-4"/> Add
+                    <Plus className="w-4 h-4"/> Add Amenity
                   </button>
                 </div>
                 
                 <div className="space-y-2">
                   {(editingRoom.amenities || []).map((amenity, i) => (
-                    <div key={`amenity-input-${i}`} className="flex gap-2">
+                    <div key={`amenity-input-${i}`} className="flex flex-col sm:flex-row gap-2">
                       <input 
                         value={amenity} 
                         onChange={e => updateAmenity(i, e.target.value)} 
-                        className="flex-1 p-2 border text-gray-700 rounded"
-                        placeholder="Amenity"
+                        className="flex-1 p-2 border text-gray-700 rounded text-sm"
+                        placeholder="e.g., Free WiFi, Air Conditioning, Room Service"
                       />
                       <button 
                         onClick={() => removeAmenity(i)} 
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 hover:text-red-700 p-2 w-full sm:w-auto flex items-center justify-center gap-1 border border-red-200 rounded hover:bg-red-50"
                       >
                         <Trash2 className="w-4 h-4"/>
+                        <span className="sm:hidden">Remove</span>
                       </button>
                     </div>
                   ))}
+                  {!(editingRoom.amenities || []).length && (
+                    <div className="text-sm text-gray-500 text-center py-3 border border-dashed border-gray-300 rounded">
+                      No amenities added yet. Click "Add Amenity" to get started.
+                    </div>
+                  )}
                 </div>
               </div>
               
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
                 <button 
                   onClick={saveRoom} 
-                  className="flex-1 py-3 bg-orange-600 text-white rounded hover:bg-orange-700 flex items-center justify-center gap-2"
+                  className="flex-1 py-2 sm:py-3 bg-orange-600 text-white rounded hover:bg-orange-700 flex items-center justify-center gap-2 text-sm sm:text-base"
                 >
                   <Save className="w-4 h-4"/> Save Room
                 </button>
                 <button 
                   onClick={() => setEditingRoom(null)} 
-                  className="px-6 py-3 bg-gray-200 rounded text-gray-700 hover:bg-gray-300"
+                  className="flex-1 sm:flex-none px-6 py-2 sm:py-3 bg-gray-200 rounded text-gray-700 hover:bg-gray-300 text-sm sm:text-base"
                 >
                   Cancel
                 </button>

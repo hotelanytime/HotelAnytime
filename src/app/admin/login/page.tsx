@@ -30,7 +30,7 @@ export default function AdminLogin() {
           redirectedRef.current = true;
             router.replace('/admin/dashboard');
         }
-      } catch (_) {
+      } catch {
         // ignore
       }
     };
@@ -53,8 +53,8 @@ export default function AdminLogin() {
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        toast.error(error.error || 'Login failed');
+        const errorBody = await response.json().catch(() => ({}));
+        toast.error(errorBody.error || 'Login failed');
         return;
       }
 
@@ -133,7 +133,7 @@ export default function AdminLogin() {
               id="username"
               value={credentials.username}
               onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-gray-600 outline-none transition-all"
               placeholder="Enter your username"
               required
             />
@@ -149,7 +149,7 @@ export default function AdminLogin() {
                 id="password"
                 value={credentials.password}
                 onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none transition-all pr-12"
+                className="w-full px-4 py-3 border border-gray-300 text-gray-600 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none transition-all pr-12"
                 placeholder="Enter your password"
                 required
               />
