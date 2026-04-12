@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { Gallery, Hero } from '@/types';
 
 export default function TestImages() {
-  const [heroData, setHeroData] = useState<any>(null);
-  const [galleryData, setGalleryData] = useState<any>(null);
+  const [heroData, setHeroData] = useState<Hero | null>(null);
+  const [galleryData, setGalleryData] = useState<Gallery | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,15 +42,13 @@ export default function TestImages() {
           {heroData?.backgroundImage ? (
             <div className="space-y-4">
               <p className="text-sm text-gray-600">URL: {heroData.backgroundImage}</p>
-              <img 
+              <Image
                 src={heroData.backgroundImage}
                 alt="Hero background"
+                width={768}
+                height={256}
                 className="w-full max-w-md h-64 object-cover border rounded"
                 onLoad={() => console.log('Hero image loaded successfully')}
-                onError={(e) => {
-                  console.error('Hero image failed to load:', heroData.backgroundImage);
-                  e.currentTarget.style.border = '2px solid red';
-                }}
               />
             </div>
           ) : (
@@ -60,18 +60,16 @@ export default function TestImages() {
           <h2 className="text-xl font-semibold mb-4">Gallery Images</h2>
           {galleryData?.images?.length ? (
             <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-              {galleryData.images.map((img: any, i: number) => (
+              {galleryData.images.map((img, i) => (
                 <div key={i} className="space-y-2">
                   <p className="text-xs text-gray-600 truncate">{img.url}</p>
-                  <img 
+                  <Image
                     src={img.url}
                     alt={img.caption || 'Gallery image'}
+                    width={320}
+                    height={128}
                     className="w-full h-32 object-cover border rounded"
                     onLoad={() => console.log(`Gallery image ${i} loaded successfully`)}
-                    onError={(e) => {
-                      console.error(`Gallery image ${i} failed to load:`, img.url);
-                      e.currentTarget.style.border = '2px solid red';
-                    }}
                   />
                 </div>
               ))}

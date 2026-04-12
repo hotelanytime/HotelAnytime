@@ -10,7 +10,7 @@ export async function GET() {
       try {
         await connectDB();
         hero = await Hero.findOne().sort({ createdAt: -1 });
-      } catch (dbErr) {
+      } catch {
         // Silently fall back to default data if DB connection fails.
         hero = null;
       }
@@ -33,7 +33,7 @@ export async function GET() {
     };
     
     return NextResponse.json(heroResponse);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch hero data' },
       { status: 500 }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     );
     
     return NextResponse.json(hero);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to update hero data' },
       { status: 500 }

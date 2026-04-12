@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const resources: Asset[] = await listCloudinaryImages(folder, max);
 
     return NextResponse.json({ assets: resources });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to list assets' }, { status: 500 });
   }
 }

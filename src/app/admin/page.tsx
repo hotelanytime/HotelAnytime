@@ -22,7 +22,7 @@ export default function AdminRedirect() {
           // Not authenticated, go to login
           router.push('/admin/login');
         }
-      } catch (error) {
+      } catch {
         // Error checking auth, go to login
         router.push('/admin/login');
       }

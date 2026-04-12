@@ -5,6 +5,7 @@ import ImageLibraryModal from './ImageLibraryModal';
 import { Plus, Trash2, Image as ImageIcon, Save, Edit, X, Grid } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import { getCsrfToken } from '@/lib/csrf';
 
 interface Props { 
   data: Gallery | null; 
@@ -55,9 +56,10 @@ export default function GalleryManager({ data, onSaved }: Props) {
   
   const save = async () => { 
     try { 
+      const csrfToken = await getCsrfToken();
       const res = await fetch('/api/gallery', {
         method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken }, 
         body: JSON.stringify(form)
       }); 
       if (!res.ok) throw new Error(); 
@@ -130,7 +132,7 @@ export default function GalleryManager({ data, onSaved }: Props) {
                       alt={img.caption || `Gallery image ${i + 1}`}
                       layout="fill"
                       objectFit="cover"
-                      onError={(e) => {
+                      onError={() => {
                         console.error('Gallery image failed to load:', img.url);
                       }}
                       onLoad={() => {
@@ -210,7 +212,7 @@ export default function GalleryManager({ data, onSaved }: Props) {
                     alt="Gallery image preview"
                     layout="fill"
                     objectFit="cover"
-                    onError={(e) => {
+                    onError={() => {
                       console.error('Edit modal image failed to load:', form.images?.[editingIndex]?.url);
                     }}
                   />

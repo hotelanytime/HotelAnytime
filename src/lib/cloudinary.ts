@@ -1,4 +1,4 @@
-import { v2 as cloudinary, UploadApiResponse, SearchApiResponse } from 'cloudinary';
+import { v2 as cloudinary, SearchApiResponse } from 'cloudinary';
 import { Asset } from '@/types';
 
 cloudinary.config({
@@ -29,7 +29,7 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
         )
         .end(buffer);
     });
-  } catch (error) {
+  } catch {
     throw new Error('Error uploading to Cloudinary');
   }
 };
@@ -37,7 +37,7 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
 export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
   try {
     await cloudinary.uploader.destroy(publicId);
-  } catch (error) {
+  } catch {
     throw new Error('Error deleting from Cloudinary');
   }
 };

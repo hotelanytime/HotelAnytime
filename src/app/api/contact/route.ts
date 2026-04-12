@@ -10,7 +10,7 @@ export async function GET() {
       try {
         await connectDB();
         contact = await Contact.findOne().sort({ createdAt: -1 });
-      } catch (dbErr) {
+      } catch {
         contact = null;
       }
     }
@@ -34,7 +34,7 @@ export async function GET() {
     }
     
     return NextResponse.json(contact);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch contact data' },
       { status: 500 }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const contactDoc = await Contact.findOneAndUpdate({}, body, { upsert: true, new: true });
     return NextResponse.json(contactDoc);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to update contact data' },
       { status: 500 }

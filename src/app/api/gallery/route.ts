@@ -10,7 +10,7 @@ export async function GET() {
       try {
         await connectDB();
         gallery = await Gallery.findOne().sort({ createdAt: -1 });
-      } catch (dbErr) {
+      } catch {
         gallery = null;
       }
     }
@@ -54,7 +54,7 @@ export async function GET() {
     }
     
     return NextResponse.json(gallery);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch gallery data' },
       { status: 500 }
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const galleryDoc = await Gallery.findOneAndUpdate({}, body, { upsert: true, new: true });
     return NextResponse.json(galleryDoc);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to update gallery data' },
       { status: 500 }

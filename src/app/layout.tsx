@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import ToastProvider from '@/components/ToastProvider';
 
@@ -16,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Hotel Anytime - Luxury Accommodation",
   description: "Experience luxury and comfort at Hotel Anytime. Premium rooms, excellent service, and world-class amenities.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -30,6 +34,7 @@ export default function RootLayout({
       >
         {children}
         <ToastProvider />
+        <Analytics />
       </body>
     </html>
   );

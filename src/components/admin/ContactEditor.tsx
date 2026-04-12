@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { Contact } from '@/types';
-import { Save, Plus, Trash2, MapPin, Phone, Mail, Clock, Globe } from 'lucide-react';
+import { Save, Plus, Trash2, MapPin, Phone, Clock, Globe } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getCsrfToken } from '@/lib/csrf';
 
 interface Props { 
   data: Contact | null; 
@@ -17,6 +18,8 @@ interface SocialLink {
 
 export default function ContactEditor({ data, onSaved }: Props) {
   const [form, setForm] = useState<Partial<Contact & { socialLinks: SocialLink[] }>>({});
+
+  const toPlatformKey = (platform: string) => platform.trim().toLowerCase().replace(/\s+/g, '');
   
   useEffect(() => { 
     if (data) {
@@ -56,10 +59,23 @@ export default function ContactEditor({ data, onSaved }: Props) {
   
   const save = async () => { 
     try { 
+      const csrfToken = await getCsrfToken();
+      const socialLinksObject = (form.socialLinks || []).reduce<Record<string, string>>((acc, link) => {
+        const key = toPlatformKey(link.platform || '');
+        const url = (link.url || '').trim();
+        if (key && url) acc[key] = url;
+        return acc;
+      }, {});
+
+      const payload = {
+        ...form,
+        socialLinks: socialLinksObject,
+      };
+
       const res = await fetch('/api/contact', {
         method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(form)
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken }, 
+        body: JSON.stringify(payload)
       }); 
       if (!res.ok) throw new Error(); 
       const contact = await res.json(); 
@@ -275,7 +291,7 @@ export default function ContactEditor({ data, onSaved }: Props) {
               
               {!(form.socialLinks || []).length && (
                 <div className="text-sm text-gray-500 text-center py-4 border border-dashed border-gray-300 rounded">
-                  No social media links added yet. Click "Add Social Link" to get started.
+                  No social media links added yet. Click &quot;Add Social Link&quot; to get started.
                 </div>
               )}
             </div>

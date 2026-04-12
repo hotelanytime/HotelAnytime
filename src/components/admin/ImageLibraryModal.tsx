@@ -4,6 +4,7 @@ import { Asset } from '@/types';
 import { X, Upload, RefreshCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import { getCsrfToken } from '@/lib/csrf';
 
 interface Props { 
   isOpen: boolean; 
@@ -43,10 +44,11 @@ export default function ImageLibraryModal({ isOpen, onClose, onSelect, multiple 
     if (!files?.length) return; 
     setUploading(true);
     try {
+      const csrfToken = await getCsrfToken();
       for (const file of Array.from(files)) {
         const form = new FormData(); 
         form.append('file', file);
-        const res = await fetch('/api/upload', { method: 'POST', body: form });
+        const res = await fetch('/api/upload', { method: 'POST', headers: { 'x-csrf-token': csrfToken }, body: form });
         if (!res.ok) throw new Error();
       }
       toast.success('Upload complete'); 
@@ -79,8 +81,8 @@ export default function ImageLibraryModal({ isOpen, onClose, onSelect, multiple 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[80vh] flex flex-col">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[80vh] min-h-0 flex flex-col">
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold text-gray-900">Image Library</h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded">
@@ -99,26 +101,30 @@ export default function ImageLibraryModal({ isOpen, onClose, onSelect, multiple 
           {uploading && <span className="text-sm text-gray-500">Uploading...</span>}
         </div>
         
-        <div className="flex-1 overflow-auto p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {loading && <div className="col-span-full text-center text-gray-500">Loading...</div>}
-          {!loading && assets.map(a => {
-            const sel = !!selected[a.public_id];
-            return (
-              <button 
-                key={a.public_id} 
-                type="button" 
-                onClick={() => toggleSelect(a)} 
-                className={`relative group rounded overflow-hidden border ${sel ? 'ring-2 ring-orange-500' : 'hover:shadow'}`}
-              >
-                                <Image src={a.url} alt={a.public_id} width={128} height={128} className="w-full h-32 object-cover"/>
-                {sel && (
-                  <span className="absolute top-1 right-1 bg-orange-600 text-white text-xs px-2 py-0.5 rounded">
-                    Selected
-                  </span>
-                )}
-              </button>
-            );
-          })}
+        <div className="flex-1 min-h-0 p-4 overflow-hidden">
+          <div className="h-full overflow-y-auto pr-1">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {loading && <div className="col-span-full text-center text-gray-500">Loading...</div>}
+              {!loading && assets.map(a => {
+                const sel = !!selected[a.public_id];
+                return (
+                  <button 
+                    key={a.public_id} 
+                    type="button" 
+                    onClick={() => toggleSelect(a)} 
+                    className={`relative group rounded overflow-hidden border ${sel ? 'ring-2 ring-orange-500' : 'hover:shadow'}`}
+                  >
+                    <Image src={a.url} alt={a.public_id} width={128} height={128} className="w-full h-32 object-cover"/>
+                    {sel && (
+                      <span className="absolute top-1 right-1 bg-orange-600 text-white text-xs px-2 py-0.5 rounded">
+                        Selected
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
         
         <div className="p-4 border-t flex justify-end gap-3">

@@ -4,7 +4,7 @@ import { Room } from '@/models';
 import { hasMongoURI } from '@/lib/mongodb';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -66,7 +66,7 @@ export async function GET(
       try {
         await connectDB();
         room = await Room.findById(id);
-      } catch (mongoError) {
+      } catch {
         // MongoDB query failed, fall back to default data
         console.log('MongoDB query failed, using fallback data');
       }
@@ -110,11 +110,16 @@ export async function PUT(
     // Prepare room data with defaults for required fields
     const roomData = {
       name: body.name || 'Updated Room',
+      type: body.type || 'Standard',
       shortDescription: body.shortDescription || 'An updated room',
       description: body.description || 'An updated description of this room.',
       price: body.price || 100,
+      videoUrl: body.videoUrl || '',
+      coverImage: body.coverImage || '',
       images: body.images || [],
       amenities: body.amenities || [],
+      maxGuests: body.maxGuests || 2,
+      rating: body.rating || 4,
       capacity: body.capacity || 2,
       size: body.size || '25 sqm',
       available: body.available !== undefined ? body.available : true
@@ -152,7 +157,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;

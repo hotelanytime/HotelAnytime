@@ -46,37 +46,23 @@ export default function AdminDashboard() {
   const checkAuth = useCallback(async () => {
     if (redirectingRef.current) return;
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('admin-token') : null;
-      console.log('Dashboard - Token from localStorage:', token ? 'exists' : 'missing');
-
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      console.log('Dashboard - Making verify request');
       const response = await fetch('/api/admin/verify', {
         method: 'GET',
-        headers,
         credentials: 'include'
       });
 
-      console.log('Dashboard - Verify response status:', response.status);
-
       if (!response.ok) {
-        console.log('Dashboard - Verification failed, clearing token');
-        if (token) localStorage.removeItem('admin-token');
         setAuthLoading(false);
         redirectingRef.current = true;
         router.replace('/admin/login');
         return;
       }
 
-      console.log('Dashboard - Authentication successful');
       setIsAuthenticated(true);
       setAuthLoading(false);
       fetchData();
     } catch (error) {
       console.error('Dashboard - Auth check failed:', error);
-      if (typeof window !== 'undefined') localStorage.removeItem('admin-token');
       setAuthLoading(false);
       redirectingRef.current = true;
       router.replace('/admin/login');
@@ -116,11 +102,9 @@ export default function AdminDashboard() {
     }
   };
 
-  type UpdatableData = Hero | About | Room[] | Gallery | Contact;
-
   const handleLogout = async () => {
     try {
-      localStorage.removeItem('admin-token');
+      await fetch('/api/admin/auth', { method: 'DELETE', credentials: 'include' });
       router.replace('/admin/login');
     } catch (error) {
       console.error('Logout error:', error);

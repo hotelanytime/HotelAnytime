@@ -52,6 +52,10 @@ const roomSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    default: 'Standard',
+  },
   description: {
     type: String,
     required: true,
@@ -64,11 +68,27 @@ const roomSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  videoUrl: {
+    type: String,
+    default: '',
+  },
+  coverImage: {
+    type: String,
+    default: '',
+  },
   images: [{
     type: String,
     required: true,
   }],
   amenities: [String],
+  maxGuests: {
+    type: Number,
+    default: 2,
+  },
+  rating: {
+    type: Number,
+    default: 4,
+  },
   capacity: {
     type: Number,
     required: true,
@@ -112,15 +132,40 @@ const contactSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  website: String,
+  hours: String,
+  checkinTime: String,
+  checkoutTime: String,
   socialLinks: {
-    facebook: String,
-    twitter: String,
-    instagram: String,
-    linkedin: String,
+    type: Map,
+    of: String,
+    default: {},
   },
   coordinates: {
     lat: Number,
     lng: Number,
+  },
+}, {
+  timestamps: true,
+});
+
+const adminLoginAttemptSchema = new mongoose.Schema({
+  key: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  count: {
+    type: Number,
+    default: 0,
+  },
+  windowStart: {
+    type: Date,
+    default: Date.now,
+  },
+  blockedUntil: {
+    type: Date,
+    default: null,
   },
 }, {
   timestamps: true,
@@ -131,3 +176,5 @@ export const About = mongoose.models.About || mongoose.model('About', aboutSchem
 export const Room = mongoose.models.Room || mongoose.model('Room', roomSchema);
 export const Gallery = mongoose.models.Gallery || mongoose.model('Gallery', gallerySchema);
 export const Contact = mongoose.models.Contact || mongoose.model('Contact', contactSchema);
+export const AdminLoginAttempt =
+  mongoose.models.AdminLoginAttempt || mongoose.model('AdminLoginAttempt', adminLoginAttemptSchema);

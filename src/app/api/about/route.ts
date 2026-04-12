@@ -10,7 +10,7 @@ export async function GET() {
       try {
         await connectDB();
         about = await About.findOne().sort({ createdAt: -1 });
-      } catch (dbErr) {
+      } catch {
         about = null;
       }
     }
@@ -46,7 +46,7 @@ export async function GET() {
     }
     
     return NextResponse.json(about);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch about data' },
       { status: 500 }
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     );
     
     return NextResponse.json(about);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to update about data' },
       { status: 500 }

@@ -15,15 +15,13 @@ export default function AdminLogin() {
   // Prevent double redirects
   const redirectedRef = useRef(false);
 
-  // Check if user is already logged in (prefer localStorage token then cookie)
+  // Check if user is already logged in using cookie-backed session
   useEffect(() => {
     const checkAuth = async () => {
       if (redirectedRef.current) return;
       try {
-        const localToken = typeof window !== 'undefined' ? localStorage.getItem('admin-token') : null;
         const response = await fetch('/api/admin/verify', {
           method: 'GET',
-          headers: localToken ? { 'Authorization': `Bearer ${localToken}` } : undefined,
           credentials: 'include'
         });
         if (response.ok) {
@@ -58,28 +56,15 @@ export default function AdminLogin() {
         return;
       }
 
-      const data = await response.json();
-      console.log('Login - Response data:', data);
+      await response.json();
       toast.success('Login successful!');
-
-      // Store token in localStorage
-      if (data.token) {
-        try {
-          localStorage.setItem('admin-token', data.token);
-          console.log('Login - Token stored');
-        } catch (err) {
-          console.warn('Login - Failed to store token:', err);
-        }
-      }
 
       // Immediately verify before redirect to ensure subsequent page passes auth check
       try {
         const verifyRes = await fetch('/api/admin/verify', {
           method: 'GET',
-            headers: data.token ? { 'Authorization': `Bearer ${data.token}` } : undefined,
           credentials: 'include'
         });
-        console.log('Login - Verify after auth status:', verifyRes.status);
         if (!verifyRes.ok) {
           const vr = await verifyRes.json().catch(() => ({}));
           toast.error('Verification failed: ' + (vr.error || verifyRes.status));
@@ -96,7 +81,7 @@ export default function AdminLogin() {
         console.log('Login - Redirecting to dashboard');
         router.replace('/admin/dashboard');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

@@ -108,7 +108,7 @@ export default function Gallery() {
                   layout="fill"
                   objectFit="cover"
                   className="group-hover:scale-110"
-                  onError={(e) => {
+                  onError={() => {
                     console.error('Gallery image failed to load:', image.url);
                   }}
                   onLoad={() => {

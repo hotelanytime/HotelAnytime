@@ -28,6 +28,8 @@ export interface Room {
   description: string;
   shortDescription?: string;
   price: number;
+  videoUrl?: string;
+  coverImage?: string;
   images: string[];
   amenities: string[];
   capacity?: number;

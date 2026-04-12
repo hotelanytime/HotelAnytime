@@ -74,18 +74,28 @@ export default function Rooms() {
               viewport={{ once: true }}
               className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
             >
-              {/* Room Image */}
+              {/* Room Media */}
               <div className="relative h-64 overflow-hidden">
-                <Image
-                  src={room.images[0]}
-                  alt={room.name}
-                  layout="fill"
-                  objectFit="cover"
-                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                />
+                {room.videoUrl ? (
+                  <video
+                    src={room.videoUrl}
+                    className="w-full h-full object-cover"
+                    controls
+                    muted
+                    preload="metadata"
+                  />
+                ) : (
+                  <Image
+                    src={room.coverImage || room.images[0]}
+                    alt={room.name}
+                    layout="fill"
+                    objectFit="cover"
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                  />
+                )}
                 <div className="absolute top-4 right-4">
                   <span className="bg-white bg-opacity-90 backdrop-blur-sm text-gray-900 font-bold px-3 py-1 rounded-full text-sm">
-                    ₹{room.price}/night
+                    ₹{room.price}/3 hours
                   </span>
                 </div>
                 {!room.available && (
@@ -103,7 +113,7 @@ export default function Rooms() {
                   {room.name}
                 </h3>
                 <p className="text-gray-600 mb-4 line-clamp-2">
-                  {room.shortDescription}
+                  {room.description || room.shortDescription}
                 </p>
 
                 {/* Room Details */}
