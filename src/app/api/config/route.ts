@@ -28,8 +28,8 @@ export async function GET() {
             }
           }
         }
-      } catch (dbErr) {
-        console.error('Database error in config API:', dbErr);
+      } catch (error) {
+        console.error('Database error in config API:', error);
         // Don't use any fallback, keep hotelName as null
       }
     }

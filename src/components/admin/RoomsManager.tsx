@@ -2,9 +2,10 @@
 import { useState, useEffect } from 'react';
 import { Room } from '@/types';
 import ImageLibraryModal from './ImageLibraryModal';
-import { Plus, Trash2, Image as ImageIcon, Save, Edit, X, Star } from 'lucide-react';
+import { Plus, Trash2, Image as ImageIcon, Save, Edit, X, Star, Video } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import { getCsrfToken } from '@/lib/csrf';
 
 interface Props { 
   data: Room[] | null; 
@@ -19,6 +20,7 @@ export default function RoomsManager({ data, onSaved }: Props) {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [editingRoom, setEditingRoom] = useState<EditingRoom | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
+  const [libraryMode, setLibraryMode] = useState<'images' | 'video' | 'cover'>('images');
   
   useEffect(() => { 
     if (data) setRooms(data); 
@@ -31,6 +33,8 @@ export default function RoomsManager({ data, onSaved }: Props) {
       type: '', 
       description: '', 
       price: 0, 
+      videoUrl: '',
+      coverImage: '',
       images: [], 
       amenities: [], 
       rating: 0, 
@@ -58,6 +62,14 @@ export default function RoomsManager({ data, onSaved }: Props) {
     amenities.splice(i, 1);
     updateEditing({ amenities });
   };
+
+  const removeImage = (i: number) => {
+    const images = [...(editingRoom?.images || [])];
+    const removed = images[i];
+    images.splice(i, 1);
+    const coverImage = editingRoom?.coverImage === removed ? '' : editingRoom?.coverImage || '';
+    updateEditing({ images, coverImage });
+  };
   
   const saveRoom = async () => {
     if (!editingRoom) return;
@@ -65,14 +77,15 @@ export default function RoomsManager({ data, onSaved }: Props) {
     try {
       const method = editingRoom.isNew ? 'POST' : 'PUT';
       const url = editingRoom.isNew ? '/api/rooms' : `/api/rooms/${editingRoom._id}`;
+      const csrfToken = await getCsrfToken();
       
-      const { isNew, ...roomData } = editingRoom;
+      const { ...roomData } = editingRoom;
       
       console.log('Saving room:', { method, url, roomData });
       
       const res = await fetch(url, {
         method, 
-        headers: { 'Content-Type': 'application/json' }, 
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken }, 
         body: JSON.stringify(roomData)
       });
       
@@ -110,7 +123,11 @@ export default function RoomsManager({ data, onSaved }: Props) {
     if (!roomId || !confirm('Delete this room?')) return;
     
     try {
-      const res = await fetch(`/api/rooms/${roomId}`, { method: 'DELETE' });
+      const csrfToken = await getCsrfToken();
+      const res = await fetch(`/api/rooms/${roomId}`, {
+        method: 'DELETE',
+        headers: { 'x-csrf-token': csrfToken },
+      });
       if (!res.ok) throw new Error();
       
       const newRooms = rooms.filter(r => r._id !== roomId);
@@ -157,21 +174,25 @@ export default function RoomsManager({ data, onSaved }: Props) {
               </div>
             </div>
             
-            {room.images?.[0] && (
+            {room.videoUrl ? (
+              <div className="w-full h-32 sm:h-40 rounded overflow-hidden bg-black">
+                <video src={room.videoUrl} className="w-full h-full object-cover" controls muted preload="metadata" />
+              </div>
+            ) : (room.coverImage || room.images?.[0]) ? (
               <div className="w-full h-32 sm:h-40 rounded overflow-hidden bg-gray-100">
                 <Image 
-                  src={room.images[0]} 
+                  src={room.coverImage || room.images[0]} 
                   alt={room.name} 
                   width={200} 
                   height={160} 
                   className="w-full h-full object-cover"
                 />
               </div>
-            )}
+            ) : null}
             
             <div className="text-sm space-y-1">
               <div className="text-gray-600 truncate">{room.type}</div>
-              <div className="font-medium text-gray-700">₹{room.price}/night</div>
+              <div className="font-medium text-gray-700">₹{room.price}/3 hours</div>
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 text-yellow-500 flex-shrink-0"/>
                 <span>{room.rating}</span>
@@ -185,7 +206,7 @@ export default function RoomsManager({ data, onSaved }: Props) {
           <div className="col-span-full text-center py-8 text-gray-500 border border-dashed border-gray-300 rounded-lg">
             <div className="space-y-2">
               <p>No rooms added yet.</p>
-              <p className="text-xs text-gray-400">Click "Add Room" to create your first room listing.</p>
+              <p className="text-xs text-gray-400">Click &quot;Add Room&quot; to create your first room listing.</p>
             </div>
           </div>
         )}
@@ -243,7 +264,7 @@ export default function RoomsManager({ data, onSaved }: Props) {
               
               <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-800">Price (₹ per night)</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-800">Price (₹ per 3 hours)</label>
                   <input 
                     type="number" 
                     value={editingRoom.price || 0} 
@@ -284,16 +305,19 @@ export default function RoomsManager({ data, onSaved }: Props) {
                 <label className="block text-sm font-medium mb-1 text-gray-800">Images</label>
                 <div className="space-y-2">
                   <button 
-                    onClick={() => setShowLibrary(true)} 
+                    onClick={() => {
+                      setLibraryMode('images');
+                      setShowLibrary(true);
+                    }} 
                     className="w-full sm:w-auto px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm flex items-center justify-center gap-2 text-gray-700"
                   >
                     <ImageIcon className="w-4 h-4"/> Select Images ({(editingRoom.images || []).length} selected)
                   </button>
                   
                   {(editingRoom.images || []).length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {(editingRoom.images || []).slice(0, 4).map((img, i) => (
-                        <div key={img || `image-${i}`} className="aspect-square">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-64 overflow-y-auto pr-1">
+                      {(editingRoom.images || []).map((img, i) => (
+                        <div key={img || `image-${i}`} className="aspect-square relative group">
                           <Image 
                             alt="room image" 
                             src={img} 
@@ -301,13 +325,93 @@ export default function RoomsManager({ data, onSaved }: Props) {
                             height={80} 
                             className="w-full h-full object-cover rounded"
                           />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(i)}
+                            className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100"
+                            title="Remove photo"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                          {(editingRoom.coverImage === img) && (
+                            <span className="absolute bottom-1 left-1 text-[10px] bg-orange-600 text-white px-1 rounded">Cover</span>
+                          )}
                         </div>
                       ))}
-                      {(editingRoom.images || []).length > 4 && (
-                        <div className="aspect-square bg-gray-100 rounded flex items-center justify-center text-sm">
-                          +{(editingRoom.images || []).length - 4}
-                        </div>
-                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-800">Cover Image</label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLibraryMode('cover');
+                        setShowLibrary(true);
+                      }}
+                      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm flex items-center gap-2 text-gray-700"
+                    >
+                      <ImageIcon className="w-4 h-4" /> Select Cover Image
+                    </button>
+                    {editingRoom.coverImage && (
+                      <button
+                        type="button"
+                        onClick={() => updateEditing({ coverImage: '' })}
+                        className="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded text-sm"
+                      >
+                        Remove Cover
+                      </button>
+                    )}
+                  </div>
+                  {editingRoom.coverImage && (
+                    <div className="w-full max-w-sm rounded overflow-hidden bg-gray-100">
+                      <Image src={editingRoom.coverImage} alt="cover image" width={320} height={160} className="w-full h-40 object-cover" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-800">Video</label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Video className="w-4 h-4 text-gray-600" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLibraryMode('video');
+                        setShowLibrary(true);
+                      }}
+                      className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm flex items-center gap-2 text-gray-700"
+                    >
+                      <ImageIcon className="w-4 h-4" /> Select Video
+                    </button>
+                    {editingRoom.videoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => updateEditing({ videoUrl: '' })}
+                        className="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded text-sm"
+                      >
+                        Remove Video
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="url"
+                      value={editingRoom.videoUrl || ''}
+                      onChange={e => updateEditing({ videoUrl: e.target.value })}
+                      placeholder="https://.../room-video.mp4"
+                      className="w-full p-2 sm:p-3 border rounded text-gray-700 text-sm sm:text-base"
+                    />
+                  </div>
+                  {editingRoom.videoUrl && (
+                    <div className="w-full max-w-sm rounded overflow-hidden bg-black">
+                      <video src={editingRoom.videoUrl} className="w-full h-40 object-cover" controls muted preload="metadata" />
                     </div>
                   )}
                 </div>
@@ -344,7 +448,7 @@ export default function RoomsManager({ data, onSaved }: Props) {
                   ))}
                   {!(editingRoom.amenities || []).length && (
                     <div className="text-sm text-gray-500 text-center py-3 border border-dashed border-gray-300 rounded">
-                      No amenities added yet. Click "Add Amenity" to get started.
+                      No amenities added yet. Click &quot;Add Amenity&quot; to get started.
                     </div>
                   )}
                 </div>
@@ -373,7 +477,16 @@ export default function RoomsManager({ data, onSaved }: Props) {
         isOpen={showLibrary} 
         multiple={true} 
         onClose={() => setShowLibrary(false)} 
-        onSelect={urls => updateEditing({ images: urls })}
+        onSelect={urls => {
+          if (libraryMode === 'video') {
+            const videoUrl = urls.find(url => /\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) || urls[0];
+            updateEditing({ videoUrl });
+          } else if (libraryMode === 'cover') {
+            updateEditing({ coverImage: urls[0] || '' });
+          } else {
+            updateEditing({ images: urls });
+          }
+        }}
       />
     </div>
   );

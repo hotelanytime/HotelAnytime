@@ -29,10 +29,10 @@ export async function GET(request: NextRequest) {
         authenticated: true,
         user: { username: decoded.username, role: decoded.role }
       }, { status: 200 });
-    } catch (err) {
+    } catch {
       return NextResponse.json({ authenticated: false, error: 'INVALID_TOKEN' }, { status: 401 });
     }
-  } catch (err) {
+  } catch {
     return NextResponse.json({ authenticated: false, error: 'VERIFY_EXCEPTION' }, { status: 500 });
   }
 }

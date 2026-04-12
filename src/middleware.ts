@@ -1,30 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Only protect API routes, not pages - let client-side handle page protection
-  if (request.nextUrl.pathname.startsWith('/api/admin') && 
-      !request.nextUrl.pathname.includes('/auth')) {
-    
-    // Check for Authorization header first
-    const authHeader = request.headers.get('authorization');
-    let token = null;
-    
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7);
-    } else {
-      // Fallback to cookie
-      token = request.cookies.get('admin-token')?.value;
-    }
-    
-    console.log('API Middleware - Path:', request.nextUrl.pathname);
-    console.log('API Middleware - Has auth header:', !!authHeader);
-    console.log('API Middleware - Token exists:', !!token);
-    
+  const { pathname } = request.nextUrl;
+  const method = request.method.toUpperCase();
+
+  const isProtectedAdminPage = pathname.startsWith('/admin') && pathname !== '/admin/login';
+  const isAdminApi =
+    pathname.startsWith('/api/admin') &&
+    !pathname.startsWith('/api/admin/auth') &&
+    !pathname.startsWith('/api/admin/csrf');
+
+  const isProtectedContentWriteApi =
+    (pathname.startsWith('/api/hero') ||
+      pathname.startsWith('/api/about') ||
+      pathname.startsWith('/api/contact') ||
+      pathname.startsWith('/api/gallery') ||
+      pathname.startsWith('/api/rooms') ||
+      pathname.startsWith('/api/upload') ||
+      pathname.startsWith('/api/assets')) &&
+    method !== 'GET';
+
+  const shouldProtect = isProtectedAdminPage || isAdminApi || isProtectedContentWriteApi;
+
+  if (shouldProtect) {
+    const token = request.cookies.get('admin-token')?.value;
     if (!token) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      const loginUrl = new URL('/admin/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  if (isProtectedContentWriteApi) {
+    const origin = request.headers.get('origin');
+    const host = request.headers.get('host');
+
+    if (origin && host) {
+      try {
+        const originHost = new URL(origin).host;
+        if (originHost !== host) {
+          return NextResponse.json({ error: 'Forbidden origin' }, { status: 403 });
+        }
+      } catch {
+        return NextResponse.json({ error: 'Invalid origin' }, { status: 403 });
+      }
+    }
+
+    const csrfCookie = request.cookies.get('admin-csrf-token')?.value || '';
+    const csrfHeader = request.headers.get('x-csrf-token') || '';
+    if (!csrfCookie || !csrfHeader || csrfCookie !== csrfHeader) {
+      return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
     }
   }
   
@@ -32,5 +59,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: []  // Temporarily disable all middleware
+  matcher: ['/admin/:path*', '/api/:path*']
 };

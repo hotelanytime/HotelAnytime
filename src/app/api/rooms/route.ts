@@ -11,7 +11,7 @@ export async function GET() {
       try {
         await connectDB();
         rooms = await Room.find();
-      } catch (dbErr) {
+      } catch {
         rooms = [];
       }
     }
@@ -79,7 +79,7 @@ export async function GET() {
     }
     
     return NextResponse.json(rooms);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch rooms data' },
       { status: 500 }
@@ -98,6 +98,8 @@ export async function POST(request: NextRequest) {
       shortDescription: body.shortDescription || 'A comfortable room',
       description: body.description || 'A detailed description of this room.',
       price: body.price || 100,
+      videoUrl: body.videoUrl || '',
+      coverImage: body.coverImage || '',
       images: body.images || [],
       amenities: body.amenities || [],
       capacity: body.capacity || 2,

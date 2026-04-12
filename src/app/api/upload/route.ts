@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const url = await uploadToCloudinary(file);
     
     return NextResponse.json({ url });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to upload image' },
       { status: 500 }

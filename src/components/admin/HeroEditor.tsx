@@ -5,6 +5,7 @@ import ImageLibraryModal from './ImageLibraryModal';
 import { Save, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import { getCsrfToken } from '@/lib/csrf';
 
 interface Props { 
   data: Hero | null; 
@@ -24,9 +25,10 @@ export default function HeroEditor({ data, onSaved }: Props) {
   
   const save = async () => { 
     try { 
+      const csrfToken = await getCsrfToken();
       const res = await fetch('/api/hero', {
         method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken }, 
         body: JSON.stringify(form)
       }); 
       if (!res.ok) throw new Error(); 
@@ -128,10 +130,10 @@ export default function HeroEditor({ data, onSaved }: Props) {
                       className="w-full h-48 sm:h-64 object-cover block"
                       alt="Hero background preview"
                       style={{ display: 'block', width: '100%', height: '192px', objectFit: 'cover' }}
-                      onError={(e) => {
+                      onError={() => {
                         console.error('Failed to load hero image:', form.backgroundImage);
                       }}
-                      onLoad={(e) => {
+                      onLoad={() => {
                         console.log('Hero image loaded successfully:', form.backgroundImage);
                       }}
                     />
