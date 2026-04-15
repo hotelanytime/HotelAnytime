@@ -88,3 +88,48 @@ export interface AdminAuth {
   username: string;
   password: string;
 }
+
+export interface FinancePayment {
+  _id?: string;
+  date: string;
+  roomId: string;
+  roomName: string;
+  customerName?: string;
+  amount: number;
+  paymentMode: 'cash' | 'upi' | 'card' | 'bank' | 'other';
+  notes?: string;
+  reference?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface FinanceExpense {
+  _id?: string;
+  date: string;
+  category: string;
+  amount: number;
+  paymentMode: 'cash' | 'upi' | 'card' | 'bank' | 'other';
+  notes?: string;
+  vendor?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface FinanceAnalytics {
+  summary: {
+    totalIncome: number;
+    totalExpense: number;
+    profit: number;
+    paymentCount: number;
+    expenseCount: number;
+  };
+  daily: Array<{
+    date: string;
+    income: number;
+    expense: number;
+    profit: number;
+  }>;
+  roomRevenue: Array<{ roomName: string; amount: number }>;
+  paymentModes: Array<{ mode: string; amount: number }>;
+  expenseCategories: Array<{ category: string; amount: number }>;
+}

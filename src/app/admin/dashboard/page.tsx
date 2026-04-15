@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Home,
@@ -9,7 +9,8 @@ import {
   Image as ImageIcon,
   Settings,
   LogOut,
-  Lock
+  Lock,
+  Wallet
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { Hero, About, Room, Gallery, Contact } from '@/types';
@@ -18,6 +19,7 @@ import AboutEditor from '@/components/admin/AboutEditor';
 import RoomsManager from '@/components/admin/RoomsManager';
 import GalleryManager from '@/components/admin/GalleryManager';
 import ContactEditor from '@/components/admin/ContactEditor';
+import FinanceManager from '@/components/admin/FinanceManager';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('hero');
@@ -33,15 +35,34 @@ export default function AdminDashboard() {
   });
   
   const router = useRouter();
+  const pathname = usePathname();
   const redirectingRef = useRef(false);
 
-  const tabs = [
+  const tabs = useMemo(() => ([
     { id: 'hero', name: 'Hero Section', icon: Home },
     { id: 'about', name: 'About', icon: Users },
     { id: 'rooms', name: 'Rooms', icon: Settings },
+    { id: 'finance', name: 'Finance', icon: Wallet },
     { id: 'gallery', name: 'Gallery', icon: ImageIcon },
     { id: 'contact', name: 'Contact', icon: Settings },
-  ];
+  ]), []);
+
+  const changeTab = useCallback((tabId: string) => {
+    setActiveTab(tabId);
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      params.set('tab', tabId);
+      window.history.replaceState(null, '', `${pathname}?${params.toString()}`);
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    if (tab && tabs.some((t) => t.id === tab)) {
+      setActiveTab(tab);
+    }
+  }, [tabs]);
 
   const checkAuth = useCallback(async () => {
     if (redirectingRef.current) return;
@@ -141,6 +162,8 @@ export default function AdminDashboard() {
             onSaved={(gallery) => setData(prev => ({ ...prev, gallery }))}
           />
         );
+      case 'finance':
+        return <FinanceManager rooms={data.rooms} />;
       case 'contact':
         return (
           <ContactEditor 
@@ -209,11 +232,11 @@ export default function AdminDashboard() {
         {/* Mobile Navigation */}
         <div className="lg:hidden bg-white border-b">
           <div className="px-4 py-3">
-            <select 
-              value={activeTab} 
-              onChange={(e) => setActiveTab(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            >
+              <select 
+                value={activeTab} 
+                onChange={(e) => changeTab(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              >
               {tabs.map((tab) => (
                 <option key={tab.id} value={tab.id}>
                   {tab.name}
@@ -230,10 +253,10 @@ export default function AdminDashboard() {
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
                 return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors font-medium ${
+                    <button
+                      key={tab.id}
+                      onClick={() => changeTab(tab.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors font-medium ${
                       activeTab === tab.id
                         ? 'bg-orange-50 text-orange-700 border border-orange-200'
                         : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
