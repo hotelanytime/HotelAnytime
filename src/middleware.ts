@@ -19,8 +19,10 @@ export function middleware(request: NextRequest) {
       pathname.startsWith('/api/upload') ||
       pathname.startsWith('/api/assets')) &&
     method !== 'GET';
+  const isFinanceApi = pathname.startsWith('/api/finance');
+  const isProtectedFinanceWriteApi = isFinanceApi && method !== 'GET';
 
-  const shouldProtect = isProtectedAdminPage || isAdminApi || isProtectedContentWriteApi;
+  const shouldProtect = isProtectedAdminPage || isAdminApi || isProtectedContentWriteApi || isFinanceApi;
 
   if (shouldProtect) {
     const token = request.cookies.get('admin-token')?.value;
@@ -33,7 +35,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  if (isProtectedContentWriteApi) {
+  if (isProtectedContentWriteApi || isProtectedFinanceWriteApi) {
     const origin = request.headers.get('origin');
     const host = request.headers.get('host');
 

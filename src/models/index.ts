@@ -171,6 +171,76 @@ const adminLoginAttemptSchema = new mongoose.Schema({
   timestamps: true,
 });
 
+const financePaymentSchema = new mongoose.Schema({
+  date: {
+    type: String,
+    required: true,
+  },
+  roomId: {
+    type: String,
+    required: true,
+  },
+  roomName: {
+    type: String,
+    required: true,
+  },
+  customerName: {
+    type: String,
+    default: '',
+  },
+  amount: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  paymentMode: {
+    type: String,
+    enum: ['cash', 'upi', 'card', 'bank', 'other'],
+    default: 'cash',
+  },
+  notes: {
+    type: String,
+    default: '',
+  },
+  reference: {
+    type: String,
+    default: '',
+  },
+}, {
+  timestamps: true,
+});
+
+const financeExpenseSchema = new mongoose.Schema({
+  date: {
+    type: String,
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  amount: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  paymentMode: {
+    type: String,
+    enum: ['cash', 'upi', 'card', 'bank', 'other'],
+    default: 'cash',
+  },
+  notes: {
+    type: String,
+    default: '',
+  },
+  vendor: {
+    type: String,
+    default: '',
+  },
+}, {
+  timestamps: true,
+});
+
 export const Hero = mongoose.models.Hero || mongoose.model('Hero', heroSchema);
 export const About = mongoose.models.About || mongoose.model('About', aboutSchema);
 export const Room = mongoose.models.Room || mongoose.model('Room', roomSchema);
@@ -178,3 +248,7 @@ export const Gallery = mongoose.models.Gallery || mongoose.model('Gallery', gall
 export const Contact = mongoose.models.Contact || mongoose.model('Contact', contactSchema);
 export const AdminLoginAttempt =
   mongoose.models.AdminLoginAttempt || mongoose.model('AdminLoginAttempt', adminLoginAttemptSchema);
+export const FinancePayment =
+  mongoose.models.FinancePayment || mongoose.model('FinancePayment', financePaymentSchema);
+export const FinanceExpense =
+  mongoose.models.FinanceExpense || mongoose.model('FinanceExpense', financeExpenseSchema);
